@@ -57,6 +57,9 @@ namespace Api
             // For performing validation of user data before using in the application
             .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<SignUpValidator>());
 
+            // Handle Model state errors
+            services.AddScoped<IValidatorInterceptor, ValidatorInterceptor>();
+     
              //Add Mediator
             services.AddMediatR();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
@@ -80,6 +83,9 @@ namespace Api
                     c.SwaggerDoc("v1", new Info { Title = "ECO API", Version = "v1" });
                 });
             }
+
+            // Check for JWT authentication where neccessary
+            services.AddJwtAuthentication();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,15 +94,6 @@ namespace Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
-                app.UseSwagger();
-                // specifying the Swagger JSON endpoint.
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("swagger/v1/swagger.json", "My API V1");
-                    c.RoutePrefix = string.Empty;
-                });
-
             }
             else
             {
@@ -104,10 +101,23 @@ namespace Api
                 app.UseHsts();
             }
 
+            if (env.IsDevelopment() || env.IsStaging()) {
+                app.UseSwagger(c => {
+                    c.RouteTemplate = "api/docs/swagger/{documentName}/swagger.json";
+                });
+                // specifying the Swagger JSON endpoint.
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/api/docs/swagger/v1/swagger.json", "My API V1");
+                    c.RoutePrefix = "api/docs";
+                });
+            }
+
             // Make sure the database is created and the migration that was created is up to date..
             app.EnsureDatabaseAndMigrationsExtension();
 
             // app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseMvc();
         }
     }
