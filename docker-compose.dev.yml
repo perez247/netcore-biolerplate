@@ -38,6 +38,7 @@ services:
       - /app/Infrastructure/bin
       - /app/Persistence/bin
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - DefaultConnection=server=mssql_image;Database=eco-appDb;user id=sa;password=noPassword@247
     depends_on:
       - mssql_image
