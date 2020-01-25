@@ -23,6 +23,8 @@ using Microsoft.Extensions.Options;
 using Persistence.Extensions;
 using Swashbuckle.AspNetCore.Swagger;
 
+using Api.Extensions;
+
 namespace Api
 {
     public class Startup
@@ -77,15 +79,15 @@ namespace Api
 
             if (env.IsDevelopment())
             {
-                // Add swagger
-                services.AddSwaggerGen(c =>
-                {
-                    c.SwaggerDoc("v1", new Info { Title = "ECO API", Version = "v1" });
-                });
+                services.AddSwaggerDocumentation();
             }
 
             // Check for JWT authentication where neccessary
             services.AddJwtAuthentication();
+
+            services.AddMemoryCache(); // Adds a default in-memory  
+                                       // implementation of  
+                                       // IDistributedCache
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -102,15 +104,7 @@ namespace Api
             }
 
             if (env.IsDevelopment() || env.IsStaging()) {
-                app.UseSwagger(c => {
-                    c.RouteTemplate = "api/docs/swagger/{documentName}/swagger.json";
-                });
-                // specifying the Swagger JSON endpoint.
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/api/docs/swagger/v1/swagger.json", "My API V1");
-                    c.RoutePrefix = "api/docs";
-                });
+                app.UseSwaggerDocumentation();
             }
 
             // Make sure the database is created and the migration that was created is up to date..

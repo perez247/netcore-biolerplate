@@ -14,17 +14,21 @@ namespace Persistence.Extensions
             // change the method in x.UseSqlServer to the desired method
             // Configure the connection string in appsettings.json
             // If chosen DB in Production is different from Development, youll have to download to right api for them
-            if (Staging) {
-                // Using MS SQL for Production
-                services.AddDbContext<DefaultDataContext>(x => x.UseSqlite(
+            // if (Staging) {
+            //     // Using MS SQL for Production
+            //     services.AddDbContext<DefaultDataContext>(x => x.UseSqlite(
+            //             connectionString, b => b.MigrationsAssembly(assemblyName)
+            //     ));
+            // } else {
+            //     // Using MS SQL for Development
+            //     services.AddDbContext<DefaultDataContext>(x => x.UseSqlServer(
+            //             connectionString, b => b.MigrationsAssembly(assemblyName)
+            //     ));
+            // }
+
+            services.AddDbContext<DefaultDataContext>(x => x.UseMySql(
                         connectionString, b => b.MigrationsAssembly(assemblyName)
-                ));
-            } else {
-                // Using MS SQL for Development
-                services.AddDbContext<DefaultDataContext>(x => x.UseSqlServer(
-                        connectionString, b => b.MigrationsAssembly(assemblyName)
-                ));
-            }
+            ));
 
             // Configure Identity if required else comment this code
             services.ConfigureIdentity();

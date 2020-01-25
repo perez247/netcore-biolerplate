@@ -2,11 +2,21 @@ version: "3.4"
 
 services:
 
-  mssql_image:
-    image: mcr.microsoft.com/mssql/server
+  # MSSQL IMAGE
+  # mssql_image:
+  #   image: mcr.microsoft.com/mssql/server
+  #   environment:
+  #       SA_PASSWORD: "noPassword@247"
+  #       ACCEPT_EULA: "Y"
+
+  mysql_image:
+    image: mysql:latest
     environment:
-        SA_PASSWORD: "noPassword@247"
-        ACCEPT_EULA: "Y"
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+      MYSQL_DATABASE: db
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: dbuserpassword
+    restart: always
 
   nginx:
     restart: always
@@ -32,15 +42,23 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./backend:/app
-      - /app/Api/bin
-      - /app/Application/bin
-      - /app/Domain/bin
-      - /app/Infrastructure/bin
-      - /app/Persistence/bin
+      - /app/Api/bin/
+      - /app/Application/bin/
+      - /app/Domain/bin/
+      - /app/Infrastructure/bin/
+      - /app/Persistence/bin/
+      - /app/Api/obj/
+      - /app/Application/obj/
+      - /app/Domain/obj/
+      - /app/Infrastructure/obj/
+      - /app/Persistence/obj/
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - DefaultConnection=server=mssql_image;Database=eco-appDb;user id=sa;password=noPassword@247
+      # For MSSQL
+      # - DefaultConnection=server=mssql_image;Database=eco-appDb;user id=sa;password=noPassword@247
+      # For MySQL
+      - DefaultConnection=server=mysql_image;database=db;user=dbuser;password=dbuserpassword
     depends_on:
-      - mssql_image
+      - mysql_image
     ports:
       - "5000:5000"
