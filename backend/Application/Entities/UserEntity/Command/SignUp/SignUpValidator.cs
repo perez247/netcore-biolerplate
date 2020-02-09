@@ -10,7 +10,6 @@ namespace Application.Entities.UserEntity.Command.SignUp
             RuleFor(x => x.LastName).NotEmpty();
             RuleFor(x => x.Password).NotEmpty();
             RuleFor(x => x.Email).NotEmpty().EmailAddress();
-            RuleFor(x => x.Username).NotEmpty();
         }
     }
 }

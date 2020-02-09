@@ -34,7 +34,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "3000:4200"
 
   backend:
     build:
@@ -58,6 +58,7 @@ services:
       # - DefaultConnection=server=mssql_image;Database=eco-appDb;user id=sa;password=noPassword@247
       # For MySQL
       - DefaultConnection=server=mysql_image;database=db;user=dbuser;password=dbuserpassword
+      - AUTHORIZATION_TOKEN=ThisismenttobetheAuthorizationtoken
     depends_on:
       - mysql_image
     ports:

@@ -1,19 +1,19 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Exceptions;
+using Application.Infrastructure.Validations;
 using Application.Interfaces.IRepositories;
 using Domain.Entities;
 using MediatR;
 
 namespace Application.Entities.UserEntity.Command.SignUp
 {
-    public class SignUpCommand : IRequest<SignUpDto>
+    public class SignUpCommand : CaptchaCredentials, IRequest<SignUpDto>
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public string Username { get; set; }
     }
 
     public class SignUpHandler : IRequestHandler<SignUpCommand, SignUpDto>
@@ -28,7 +28,6 @@ namespace Application.Entities.UserEntity.Command.SignUp
         {
             var newUser = new User() {
                 Email = request.Email,
-                UserName = request.Username,
                 UserDetail = new UserDetail() {
                     FirstName = request.FirstName,
                     LastName = request.LastName

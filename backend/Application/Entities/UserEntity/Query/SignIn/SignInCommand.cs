@@ -11,6 +11,7 @@ namespace Application.Entities.UserEntity.Query.SignIn
     {
         public string UserNameEmail { get; set; }
         public string Password { get; set; }
+        public bool? RememberMe { get; set; }
     }
 
     public class SignInCommandHandler : IRequestHandler<SignInCommand, SignInModel>

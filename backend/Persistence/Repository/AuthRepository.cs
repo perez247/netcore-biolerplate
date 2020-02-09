@@ -32,6 +32,7 @@ namespace Persistence.Repository
         }
 
         public async Task<User> SignIn(string userNameOrEmail, string Password) {
+
             var user = await _userManager.Users
                 .FirstOrDefaultAsync(u => 
                     u.Email.ToUpper() == userNameOrEmail.ToUpper() ||
@@ -40,6 +41,13 @@ namespace Persistence.Repository
 
             if (user == null)
                 return null;
+
+            // var canSignIn = await _signInManager.CanSignInAsync(user);
+
+            // if (!canSignIn)
+            //     return null;
+
+            // var result = _signInManager.
 
             var login = await _userManager.CheckPasswordAsync(user, Password);
 

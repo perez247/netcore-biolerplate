@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
+    /// <summary>
+    /// Authentication Api for verifying/Authenticating and Authorizaing users
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : BaseController
@@ -35,7 +38,7 @@ namespace Api.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(SignInModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
-        [HttpPost("signin")]
+        [HttpGet("signin")]
         public async Task<IActionResult> SignIn(SignInCommand command) {
             return Ok(await Mediator.Send(command));
             // return Ok(command);

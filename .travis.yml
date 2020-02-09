@@ -1,36 +1,33 @@
+
 sudo: required
-language: generic
-services:
-  - docker
+dist: trusty
 
-jobs:
+branches:
+  only:
+    - master
+
+matrix:
   include:
-    - stage: deploy-staging
-      if: branch = develop
-      before_install:
-        - docker build -t ecoafrica/frontend_dev ./frontend
-        - docker build -t ecoafrica/backend_dev -f ./backend/Dockerfile.staging ./backend
-        - docker build -t ecoafrica/nginx_dev ./nginx
-      install:
-        # login to docker hub
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
 
-        # push to docker hub
-        - docker push ecoafrica/frontend_dev
-        - docker push ecoafrica/backend_dev
-        - docker push ecoafrica/nginx_dev
-      
-    - stage: deploy-production
-      if: branch = master
-      before_install:
-        - docker build -t ecoafrica/frontend ./frontend
-        - docker build -t ecoafrica/backend ./backend
-        - docker build -t ecoafrica/nginx ./nginx
-      install:
-        # login to docker hub
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
 
-        # push to docker hub uisng login_page
-        - docker push ecoafrica/frontend
-        - docker push ecoafrica/backend
-        - docker push ecoafrica/nginx
+    - languagage: node_js
+      before_install:
+      - cd frontend
+      install:
+      - npm install -g @angular/cli@8.3.24
+      - npm install
+      after_success:
+      - ng build --aot --prod --output-path=./../backend/Api/wwwroot
+
+
+    - language: csharp
+      before install:
+      - cd ./../backend/Api/
+      install:
+      - dotnet restore
+      after_success:
+      - dotnet publish -c Release -o out
+
+      anguage: node_js
+      after_success:
+      - find . -type d \( -path "./out/.*" \) -prune -o -name "*" -print -exec curl --ftp-create-dirs -T {} ftp://your.server.com/dir/ --user ${SFTP_USER}:${SFTP_PASSWORD} \;

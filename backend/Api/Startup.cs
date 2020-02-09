@@ -24,6 +24,7 @@ using Persistence.Extensions;
 using Swashbuckle.AspNetCore.Swagger;
 
 using Api.Extensions;
+using System.IO;
 
 namespace Api
 {
@@ -62,12 +63,6 @@ namespace Api
             // Handle Model state errors
             services.AddScoped<IValidatorInterceptor, ValidatorInterceptor>();
      
-             //Add Mediator
-            services.AddMediatR();
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
-     
              // Add DataContext implementation of Application interfaces
             services.ImplementApplicationDatabaseInterfaces();
             //
@@ -77,7 +72,14 @@ namespace Api
             // Add AutoMapper
             services.AddAutoMapper(new Assembly[] { typeof(AutoMapperProfile).GetTypeInfo().Assembly });
 
-            if (env.IsDevelopment())
+             //Add Mediator
+            services.AddMediatR();
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+
+            // Add Swagger Open API only in Development or staging
+            if (env.IsDevelopment() || env.IsStaging())
             {
                 services.AddSwaggerDocumentation();
             }
@@ -113,6 +115,22 @@ namespace Api
             // app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc();
+
+            // Return static files if no route is found
+            app.Use(async (context, next) => 
+            { 
+                await next(); 
+                var path = context.Request.Path.Value;
+
+                if (!path.StartsWith("api") && !Path.HasExtension(path)) 
+                { 
+                    context.Request.Path = "/index.html"; 
+                    await next(); 
+                } 
+            });      
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
         }
     }
 }
