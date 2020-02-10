@@ -3,9 +3,11 @@ import { SharedCommonModule } from './modules/shared-modules/shared-common.modul
 import { SharedComponentsModule } from './modules/shared-modules/shared-components.module';
 import { SharedServiceModule } from './modules/shared-modules/shared-services.module';
 import { NgMaterialModule } from './modules/vendor/ng-material.module';
+import { SharedSnackbarComponent } from './modals/shared-snackbar/shared-snackbar.component';
+import { NgIconsModule } from './modules/vendor/ng-icons.module';
 
 @NgModule({
-  declarations: [],
+  declarations: [SharedSnackbarComponent],
   imports: [
     // The general common module used by the application
     SharedCommonModule,
@@ -17,7 +19,10 @@ import { NgMaterialModule } from './modules/vendor/ng-material.module';
     SharedComponentsModule,
 
     // Angular material module
-    NgMaterialModule
+    NgMaterialModule,
+
+    // Import all the icons to be used by the application
+    NgIconsModule,
   ],
 
   exports: [
@@ -25,7 +30,8 @@ import { NgMaterialModule } from './modules/vendor/ng-material.module';
     SharedCommonModule,
     SharedComponentsModule,
     SharedComponentsModule,
-    NgMaterialModule
+    NgMaterialModule,
+    NgIconsModule,
   ],
 
   // Modals used by all should be stored here.
