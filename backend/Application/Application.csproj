@@ -23,5 +23,4 @@
     <DocumentationFile>bin\$(Configuration)\Application.xml</DocumentationFile>
   </PropertyGroup>
 
-
 </Project>

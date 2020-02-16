@@ -11,7 +11,7 @@ namespace Api.Filters
         {
             
             if(result.Errors.Count > 0)
-                throw new Application.Exceptions.CustomValidationException(result.Errors);
+                throw new Application.Exceptions.ValidationException(result.Errors);
             
             return result;
         }

@@ -14,34 +14,198 @@ namespace Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Domain.Entities.OrganizationDetail", b =>
+            modelBuilder.Entity("Domain.Entities.Address", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("HeadQuaters");
+                    b.Property<int>("CountryId");
 
-                    b.Property<string>("Name");
+                    b.Property<bool>("Global");
 
-                    b.Property<byte[]>("UserId")
+                    b.Property<string>("PostCode")
+                        .HasMaxLength(100);
+
+                    b.Property<int>("StateId");
+
+                    b.Property<string>("Street")
+                        .HasMaxLength(1000);
+
+                    b.Property<string>("Type")
                         .IsRequired()
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                        .HasMaxLength(100);
+
+                    b.Property<Guid>("TypeId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CountryId");
 
-                    b.ToTable("OrganizationDetails");
+                    b.HasIndex("StateId");
+
+                    b.ToTable("Addresses");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Collection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<Guid>("TypeId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Collections");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Contact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Email_1")
+                        .HasMaxLength(500);
+
+                    b.Property<string>("Email_2")
+                        .HasMaxLength(500);
+
+                    b.Property<string>("Phone_1")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Phone_2")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<Guid>("TypeId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Contacts");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CoreEntities.Country", b =>
+                {
+                    b.Property<int>("Id");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("PhoneCode")
+                        .HasMaxLength(5);
+
+                    b.Property<string>("SortName")
+                        .HasMaxLength(5);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CoreEntities.EcoEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EcoEntities");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CoreEntities.Ico", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Icos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CoreEntities.PhotoType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PhotoTypes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CoreEntities.State", b =>
+                {
+                    b.Property<int>("Id");
+
+                    b.Property<int>("CountryId");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(60);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("States");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CoreEntities.UnSDGGoal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UnSDGGoals");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Photo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("DateCreated");
+
+                    b.Property<Guid?>("PhotoTypeId");
+
+                    b.Property<string>("PublicId")
+                        .HasMaxLength(1000);
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(50);
+
+                    b.Property<Guid>("TypeId");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(1000);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PhotoTypeId");
+
+                    b.ToTable("Photos");
                 });
 
             modelBuilder.Entity("Domain.Entities.Role", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
@@ -63,14 +227,17 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessFailedCount");
 
+                    b.Property<bool>("AgreeToTermsAndCondition");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
+
+                    b.Property<bool>("Deleted");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256);
@@ -114,17 +281,28 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Domain.Entities.UserDetail", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("FirstName");
+                    b.Property<string>("AboutMe")
+                        .HasMaxLength(1000);
 
-                    b.Property<string>("LastName");
+                    b.Property<DateTime>("DateCreated");
 
-                    b.Property<byte[]>("UserId")
+                    b.Property<DateTime>("DateOfBirth");
+
+                    b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Gender")
+                        .HasMaxLength(10);
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<Guid>("UserId");
 
                     b.HasKey("Id");
 
@@ -136,17 +314,13 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Domain.Entities.UserRole", b =>
                 {
-                    b.Property<byte[]>("UserId")
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("UserId");
 
-                    b.Property<byte[]>("RoleId")
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("RoleId");
 
-                    b.Property<byte[]>("RoleId1")
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid?>("RoleId1");
 
-                    b.Property<byte[]>("UserId1")
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid?>("UserId1");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -168,9 +342,7 @@ namespace Api.Migrations
 
                     b.Property<string>("ClaimValue");
 
-                    b.Property<byte[]>("RoleId")
-                        .IsRequired()
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("RoleId");
 
                     b.HasKey("Id");
 
@@ -188,9 +360,7 @@ namespace Api.Migrations
 
                     b.Property<string>("ClaimValue");
 
-                    b.Property<byte[]>("UserId")
-                        .IsRequired()
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("UserId");
 
                     b.HasKey("Id");
 
@@ -207,9 +377,7 @@ namespace Api.Migrations
 
                     b.Property<string>("ProviderDisplayName");
 
-                    b.Property<byte[]>("UserId")
-                        .IsRequired()
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("UserId");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -220,8 +388,7 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<byte[]>("UserId")
-                        .HasConversion(new ValueConverter<byte[], byte[]>(v => default(byte[]), v => default(byte[]), new ConverterMappingHints(size: 16)));
+                    b.Property<Guid>("UserId");
 
                     b.Property<string>("LoginProvider");
 
@@ -234,12 +401,32 @@ namespace Api.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Domain.Entities.OrganizationDetail", b =>
+            modelBuilder.Entity("Domain.Entities.Address", b =>
                 {
-                    b.HasOne("Domain.Entities.User", "User")
+                    b.HasOne("Domain.Entities.CoreEntities.Country", "Country")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.Entities.CoreEntities.State", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.Entities.CoreEntities.State", b =>
+                {
+                    b.HasOne("Domain.Entities.CoreEntities.Country", "Country")
+                        .WithMany("States")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Photo", b =>
+                {
+                    b.HasOne("Domain.Entities.CoreEntities.PhotoType", "PhotoType")
+                        .WithMany()
+                        .HasForeignKey("PhotoTypeId");
                 });
 
             modelBuilder.Entity("Domain.Entities.UserDetail", b =>

@@ -31,9 +31,10 @@ namespace Application.Infrastructure.RequestResponsePipeline
 
                 // TODO: Add User Details
 
-                _logger.LogWarning("Northwind Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}", name, _timer.ElapsedMilliseconds, request);
+                _logger.LogWarning("ECO Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}", name, _timer.ElapsedMilliseconds, request);
             }
 
-            return response;        }
+            return response;        
+        }
     }
 }

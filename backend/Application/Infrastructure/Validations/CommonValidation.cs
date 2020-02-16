@@ -6,6 +6,10 @@ namespace Application.Infrastructure.Validations
     public static class CommonValidation
     {
         public static bool BeAValidPassword(string password) {
+
+            if(string.IsNullOrEmpty(password))
+                return false;
+
             var validator = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#£~|])[A-Za-z\\d@$!%*?&_#£~|]{5,}$");
             return validator.Match(password).Success;
         }

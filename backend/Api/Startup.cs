@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Api.Extensions;
 using Api.Filters;
+using Api.Infrastructure;
 using Application.Entities.UserEntity.Command.SignUp;
 using Application.Infrastructure.AutoMapper;
 using Application.Infrastructure.RequestResponsePipeline;
 using AutoMapper;
+using BotDetect.Web;
 using FluentValidation.AspNetCore;
 using Infrastructure.Extensions;
 using MediatR;
@@ -15,6 +18,7 @@ using MediatR.Pipeline;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,9 +26,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Persistence.Extensions;
 using Swashbuckle.AspNetCore.Swagger;
-
-using Api.Extensions;
-using System.IO;
 
 namespace Api
 {
@@ -42,9 +43,12 @@ namespace Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+
             var prod = Environment.GetEnvironmentVariable("DefaultConnection");
-            var dev = Configuration.GetConnectionString("DefaultConnection");
+            var dev = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
             var connectionString = prod != null ? prod : dev;
+            
             //  Configure Database and Microsoft Identity
             services.ConfigureDatabaseConnections(
                 connectionString,
@@ -69,19 +73,22 @@ namespace Api
             // Add Infrastructure implementation of Application interfaces
             services.AddInfractureServices();
 
+            // Add Api implementation of Application interfaces
+            services.AddAPIServices();
+
             // Add AutoMapper
             services.AddAutoMapper(new Assembly[] { typeof(AutoMapperProfile).GetTypeInfo().Assembly });
-
-             //Add Mediator
+            
+            //Add Mediator
             services.AddMediatR();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
-            // Add Swagger Open API only in Development or staging
+            // Add Swagger Open API
             if (env.IsDevelopment() || env.IsStaging())
             {
-                services.AddSwaggerDocumentation();
+               services.AddSwaggerDocumentation();
             }
 
             // Check for JWT authentication where neccessary
@@ -98,6 +105,7 @@ namespace Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
             }
             else
             {
@@ -109,28 +117,17 @@ namespace Api
                 app.UseSwaggerDocumentation();
             }
 
+            // Implement simple capcha
+            app.UseSimpleCaptcha(Configuration.GetSection("BotDetect")); 
+
+
             // Make sure the database is created and the migration that was created is up to date..
             app.EnsureDatabaseAndMigrationsExtension();
+            app.SeedLocationsToDatabase();
 
             // app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc();
-
-            // Return static files if no route is found
-            app.Use(async (context, next) => 
-            { 
-                await next(); 
-                var path = context.Request.Path.Value;
-
-                if (!path.StartsWith("api") && !Path.HasExtension(path)) 
-                { 
-                    context.Request.Path = "/index.html"; 
-                    await next(); 
-                } 
-            });      
-
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
         }
     }
 }
